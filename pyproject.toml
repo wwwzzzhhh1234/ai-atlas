@@ -1,0 +1,16 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ai-atlas"
+version = "0.1.0"
+description = "Discovery platform and benchmark for open-source AI projects"
+requires-python = ">=3.11"
+dependencies = ["pydantic>=2.6", "PyYAML>=6.0", "python-dotenv>=1.0"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

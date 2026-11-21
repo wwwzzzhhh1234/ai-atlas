@@ -1,0 +1,93 @@
+# Collection sources, queries and inclusion thresholds (spec Section 7).
+# All numbers are starting guesses — revisit after the first M1 report.
+
+github:
+  api_base: https://api.github.com
+  graphql_url: https://api.github.com/graphql
+  search_max_results_per_query: 1000   # GitHub Search API cap; slice queries below this
+  topics:
+    - llm
+    - ai-agent
+    - ai-agents
+    - agentic-ai
+    - mcp
+    - mcp-server
+    - model-context-protocol
+    - agent-skills
+    - claude-skills
+    - rag
+    - langchain
+    - langgraph
+    - crewai
+    - autogen
+    - n8n
+    - dify
+    - generative-ai
+    - llmops
+    - guardrails
+    - ai-safety
+  # Keyword groups target niche sectors so they are not drowned out.
+  # `niche: true` groups use the lower star threshold.
+  keyword_groups:
+    healthcare:
+      sector: S01
+      niche: false
+      queries: ["clinical llm", "medical ai agent", "radiology llm", "ehr llm", "drug discovery llm"]
+    agriculture_climate:
+      sector: S02
+      niche: true
+      queries: ["agriculture llm", "crop ai agent", "climate llm", "energy grid ai agent", "food supply chain ai"]
+    governance_safety:
+      sector: S05.4
+      niche: true
+      queries: ["llm guardrails", "agent governance", "ai compliance llm", "llm red teaming", "agent sandbox"]
+    finance_legal:
+      sector: S05
+      niche: false
+      queries: ["finance llm agent", "legal llm", "contract review llm", "accounting ai agent"]
+    smart_city_transport:
+      sector: S09
+      niche: true
+      queries: ["autonomous driving llm", "traffic signal reinforcement learning llm", "smart city ai agent", "urban digital twin ai", "public transit ai"]
+    startup:
+      sector: S10
+      niche: true
+      queries: ["startup ai agent", "pitch deck generator llm", "market research ai agent", "business plan llm", "no-code mvp ai"]
+  skill_files:
+    code_search_query: "filename:SKILL.md"
+  curated_lists:   # parsed for repo links; the lists themselves are asset_type=resource
+    - anthropics/skills
+    - heilcheng/awesome-agent-skills
+    - github/awesome-copilot
+  slicing:
+    star_ranges: [[100, 199], [200, 499], [500, 999], [1000, 4999], [5000, null]]
+    niche_star_ranges: [[20, 49], [50, 99]]
+    created_after: "2018-01-01"   # lower bound for date slicing only; freshness filter is separate
+    date_slice_months: 3
+
+mcp_registry:
+  base_url: https://registry.modelcontextprotocol.io
+  api_version: null   # TODO(M1): confirm current API version from the registry docs
+  page_size: 100
+
+huggingface:
+  sort_by: [likes, downloads]
+  max_models: 2000
+  max_spaces: 2000
+
+filters:
+  require_ai_related: true
+  exclude_forks: true
+  exclude_archived: true
+  min_readme_chars: 200
+  freshness:
+    created_on_or_after: "2025-01-01"
+    or_pushed_within_months: 12
+  min_stars_default: 100
+  min_stars_niche: 20
+  niche_sectors: [S02, S05.4, S09, S10]
+
+http:
+  max_retries: 5
+  backoff_base_seconds: 2
+  timeout_seconds: 30

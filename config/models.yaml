@@ -1,0 +1,33 @@
+# LLM configuration. All values are read by code; nothing is hard-coded.
+# TODO(human, M3): verify exact model IDs and current prices in Google AI Studio.
+# Prices are USD per 1M tokens. Thinking tokens are billed as output.
+
+labeling:
+  primary:
+    name: gemini-4-neon
+    model_id: null              # TODO: exact API model ID from AI Studio
+    price_input_per_1m: 3.00    # reported launch price (spec Section 3) — verify
+    price_output_per_1m: 15.00  # reported launch price — verify
+    thinking_level: low         # use the lowest level that meets the quality bar
+    temperature: 0.1
+  cheaper:
+    name: gemini-4-hydrogen
+    model_id: null              # TODO: exact API model ID
+    price_input_per_1m: null    # TODO: look up; not recorded in the spec
+    price_output_per_1m: null
+    thinking_level: low
+    temperature: 0.1
+
+prompt_version: label_v1
+max_retries_invalid_json: 2
+readme_excerpt_max_tokens: 3000
+
+budget:
+  # Hard stop: any batch whose estimate exceeds this is refused.
+  # PLACEHOLDER — the real cap must be confirmed with the human/advisor (spec Section 12).
+  max_usd_per_run: 5.00
+  max_usd_total: null           # TODO: set once advisor confirms funds
+
+embeddings:
+  model_id: BAAI/bge-small-en-v1.5   # local sentence-transformers model, free
+  fallback_model_id: sentence-transformers/all-MiniLM-L6-v2

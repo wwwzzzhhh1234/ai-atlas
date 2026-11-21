@@ -1,0 +1,85 @@
+# Taxonomy v3 — copied verbatim from PROJECT_SPEC.md Section 5.
+# Changing this file requires human approval (spec Section 2, rule 3).
+version: 3
+sectors:
+  - id: S01
+    name: Healthcare & Life Sciences
+    fields:
+      - {id: S01.1, name: Clinical Decision & Diagnostics}
+      - {id: S01.2, name: Medical Imaging}
+      - {id: S01.3, name: Drug Discovery & Biotech}
+      - {id: S01.4, name: Mental Health & Wellness}
+      - {id: S01.5, name: Healthcare Admin & EHR Automation}
+  - id: S02
+    name: Agriculture, Energy & Climate
+    fields:
+      - {id: S02.1, name: Precision Agriculture & Crop Vision}
+      - {id: S02.2, name: Climate & Environmental Modeling}
+      - {id: S02.3, name: Energy Grid & CleanTech}
+      - {id: S02.4, name: Food Supply Chain}
+  - id: S03
+    name: Enterprise & Operations
+    fields:
+      - {id: S03.1, name: Customer Support & CRM}
+      - {id: S03.2, name: Sales & Marketing Automation}
+      - {id: S03.3, name: HR & Recruiting}
+      - {id: S03.4, name: Supply Chain & Logistics}
+      - {id: S03.5, name: Internal Knowledge Base (Enterprise RAG)}
+      - {id: S03.6, name: E-Commerce & Retail}
+  - id: S04
+    name: Automation, Robotics & Hardware
+    fields:
+      - {id: S04.1, name: Embodied AI & Robotics Control}
+      - {id: S04.2, name: Industrial Manufacturing & QA}
+      - {id: S04.3, name: IoT & Edge AI}
+      - {id: S04.4, name: Drones & Aerial Robotics}
+      - {id: S04.5, name: Browser & OS Desktop Automation}
+  - id: S05
+    name: Finance, Legal & Governance
+    fields:
+      - {id: S05.1, name: Financial Analysis & Quant}
+      - {id: S05.2, name: Accounting & Tax Automation}
+      - {id: S05.3, name: Legal Tech & Contract Review}
+      - {id: S05.4, name: Agentic Governance, Safety & Compliance}
+      - {id: S05.5, name: Cybersecurity & Red-Teaming}
+  - id: S06
+    name: Software, Data & DevTools
+    fields:
+      - {id: S06.1, name: Coding Agents & IDE Skills}
+      - {id: S06.2, name: Data Engineering & Analytics}
+      - {id: S06.3, name: DevOps & Cloud Automation}
+      - {id: S06.4, name: Testing & QA Automation}
+      - {id: S06.5, name: UI/UX & Frontend Generation}
+  - id: S07
+    name: Science, Research & Education
+    fields:
+      - {id: S07.1, name: Scientific Literature & Research Agents}
+      - {id: S07.2, name: Mathematics & Physics Modeling}
+      - {id: S07.3, name: Materials & Chemistry}
+      - {id: S07.4, name: Personalized Tutoring & EdTech}
+      - {id: S07.5, name: Academic Writing & Translation}
+  - id: S08
+    name: Media, Creative & Everyday Life
+    fields:
+      - {id: S08.1, name: Video & Audio Generation}
+      - {id: S08.2, name: Graphic Design & 3D Modeling}
+      - {id: S08.3, name: Gaming & Interactive NPCs}
+      - {id: S08.4, name: Personal Productivity & Life Assistants}
+      - {id: S08.5, name: Travel & Real Estate}
+  - id: S09
+    name: Smart City & Intelligent Transportation
+    fields:
+      - {id: S09.1, name: Autonomous Driving & Intelligent Vehicles}
+      - {id: S09.2, name: Traffic Management & Signal Control}
+      - {id: S09.3, name: Public Transit & Mobility Services}
+      - {id: S09.4, name: Urban Planning & Digital Twins}
+      - {id: S09.5, name: Smart Infrastructure & Public Safety}
+  - id: S10
+    name: Entrepreneurship & Startup Pipeline
+    fields:
+      - {id: S10.1, name: Idea Validation & Market Research}
+      - {id: S10.2, name: Business Planning & Pitch Decks}
+      - {id: S10.3, name: No-Code MVP & Product Building}
+      - {id: S10.4, name: Fundraising & Investor Relations}
+      - {id: S10.5, name: Go-to-Market & Early Growth}
+other: {id: OTHER, name: Other / Unclear}
