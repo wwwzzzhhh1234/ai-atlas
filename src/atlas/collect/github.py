@@ -158,7 +158,7 @@ def collect_keyword_groups(client: CachedClient, limit: int | None = None) -> li
     f = cfg["filters"]
     out = []
     for name, grp in list(cfg["github"]["keyword_groups"].items())[:limit]:
-        min_stars = f["min_stars_niche"] if grp.get("niche") else f["min_stars_default"]
+        min_stars = grp.get("min_stars") or (f["min_stars_niche"] if grp.get("niche") else f["min_stars_default"])
         for query in grp["queries"]:
             recs = _run_query_set(client, query, f"kw:{name}", min_stars)
             log.info("kw:%s %r -> %d repos", name, query, len(recs))

@@ -43,3 +43,14 @@ def test_readme_exclusion():
     assert filters.readme_exclusion({"has_readme": False}) == "no_readme"
     assert filters.readme_exclusion({"has_readme": True, "readme_chars": 50}) == "short_readme"
     assert filters.readme_exclusion({"has_readme": True, "readme_chars": 500}) is None
+
+
+def test_registry_only_repo_without_metadata():
+    r = rec(stars=None, group="mcp_registry")
+    assert filters.metadata_exclusion(r) == "not_found_by_search"
+    r["groups"].add("skill_file")
+    assert filters.metadata_exclusion(r) == "metadata_not_found"
+
+
+def test_mcp_keyword_group_threshold():
+    assert filters.min_stars_for(rec(group="kw:mcp_servers")) == 20

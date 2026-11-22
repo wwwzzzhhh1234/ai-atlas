@@ -31,12 +31,13 @@ def is_ai_related(rec: dict) -> bool:
 def min_stars_for(rec: dict) -> int:
     """Lowest star threshold among the groups that found this record."""
     f = _f()
-    niche_groups = {f"kw:{k}" for k, g in load_config("sources")["github"]["keyword_groups"].items()
-                    if g.get("niche")}
+    kw_groups = load_config("sources")["github"]["keyword_groups"]
+    kw_min = {f"kw:{k}": g.get("min_stars") or (f["min_stars_niche"] if g.get("niche") else f["min_stars_default"])
+              for k, g in kw_groups.items()}
     thresholds = [f["min_stars_default"]]
     for g in rec["groups"]:
-        if g in niche_groups:
-            thresholds.append(f["min_stars_niche"])
+        if g in kw_min:
+            thresholds.append(kw_min[g])
         elif g.startswith("curated"):
             thresholds.append(f["min_stars_by_group"]["curated"])
         elif g in f["min_stars_by_group"]:
@@ -56,6 +57,9 @@ def metadata_exclusion(rec: dict) -> str | None:
     """Checks that need no README (run before fetching READMEs to save requests)."""
     f = _f()
     if rec["id"].startswith("gh:") and rec.get("stars") is None:
+        registry_only = rec["groups"] == {"mcp_registry"}
+        if registry_only and not load_config("sources")["mcp_registry"].get("lookup_repos", True):
+            return "not_found_by_search"   # registry repo that no search query returned (e.g. < 20 stars)
         return "metadata_not_found"
     if not is_ai_related(rec):
         return "not_ai_related"

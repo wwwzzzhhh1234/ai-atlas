@@ -33,6 +33,13 @@ github:
   # Keyword groups target niche sectors so they are not drowned out.
   # `niche: true` groups use the lower star threshold.
   keyword_groups:
+    # Finds MCP servers by search instead of looking up all ~33k registry repos one by one
+    # (registry repos that also match these queries are merged with their registry entry).
+    mcp_servers:
+      sector: null
+      niche: false
+      min_stars: 20               # same as min_stars_by_group.mcp_registry
+      queries: ["mcp", "model context protocol"]
     healthcare:
       sector: S01
       niche: false
@@ -89,6 +96,9 @@ github_raw:
 mcp_registry:
   base_url: https://registry.modelcontextprotocol.io
   api_version: v0.1   # verified 2026-11-22 (v0 also responds; v0.1 is current)
+  # false: do NOT look up GitHub metadata for every registry repo (33k+ repos = hours of search calls).
+  # Registry repos get metadata only if a search query (topics / mcp_servers group) also finds them.
+  lookup_repos: false
   page_size: 100
   min_interval_seconds: 0.3
 

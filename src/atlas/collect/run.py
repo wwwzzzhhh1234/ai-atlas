@@ -53,8 +53,13 @@ def gather_github(smoke: bool) -> list[dict]:
 def fill_missing_metadata(records: list[dict]) -> list[dict]:
     """Look up GitHub metadata for stubs (from SKILL.md search, curated lists, MCP registry)."""
     have = {r["id"] for r in records if r.get("stars") is not None}
+    lookup_registry = load_config("sources")["mcp_registry"].get("lookup_repos", True)
+    groups_by_id: dict[str, set] = {}
+    for r in records:
+        groups_by_id.setdefault(r["id"], set()).update(r["groups"])
     need = {r["full_name"] for r in records
-            if r["id"].startswith("gh:") and r["id"] not in have and r.get("full_name")}
+            if r["id"].startswith("gh:") and r["id"] not in have and r.get("full_name")
+            and (lookup_registry or groups_by_id[r["id"]] != {"mcp_registry"})}
     log.info("GitHub metadata lookup for %d repos found by name", len(need))
     return records + github.lookup_repos(github.search_client(), need) if need else records
 
