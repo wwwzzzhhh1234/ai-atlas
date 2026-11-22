@@ -1,6 +1,6 @@
 # Progress log
 
-**Current milestone: M1 — Collection: all 3 checks done, waiting for human review of 3 tuning decisions (see 2026-11-22). Next: M2 — Gold set**
+**Current milestone: M1 — Collection: checks done + tuning applied; waiting for human sign-off. Next: M2 — Gold set**
 
 ---
 
@@ -69,3 +69,22 @@ Known limitations
 
 Next (M2) after sign-off
 - Stratified sample of ~250 (by provenance group + rough asset type), annotation guideline, labeling tool (Streamlit).
+
+### 2026-11-22 (later) — M1 tuning after human review
+
+Human decisions applied (see decisions.md): tiered V1 labeling set; broader niche-sector queries (healthcare now niche);
+curated-list minimum 20 stars; HF Spaces judged on stitched metadata + README (informative text ≥ 100 chars).
+
+New numbers (re-run: 3,106 new HTTP calls, 0 errors, 30 min)
+- Collected 91,437 → **included 28,493** (GitHub 26,941 · HF 1,552 [models 1,119 · Spaces 433, was 349]).
+- **V1 labeling set: 18,323** (general ≥ 100 stars, niche ≥ 20, HF ≥ 50 likes).
+- Star-filter preview (included GitHub): 20+: 26,941 · 50+: 18,366 · 100+: 14,398 · 500+: 5,079.
+- Niche keyword groups (included, all in V1): healthcare 950 (was 13) · smart city/transport 680 (was 12) ·
+  startup 592 (was 78) · agriculture/climate/energy 363 (was 11) · governance/safety 1,486. finance_legal 59 (not broadened, not niche).
+- Relevance check (10 random rows per niche group): ~70–80 % on-topic; misses come from ambiguous short words
+  (`traffic` → network traffic, `startup` → generic dev tools). Sector is assigned by the LLM labeler in M3, so the
+  group is only a collection hint; true per-sector counts will be somewhat lower.
+
+Open items for the human
+- Optionally broaden `finance_legal` the same way (S05.1–S05.3 currently 59 candidates).
+- Confirm the M1 spot check (`docs/m1_spotcheck.md`) → then M2 starts.
