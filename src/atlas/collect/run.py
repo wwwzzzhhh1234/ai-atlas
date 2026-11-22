@@ -28,8 +28,9 @@ from atlas.clean.readme import clean_readme
 from atlas.collect import github, huggingface, mcp_registry
 from atlas.collect.common import new_record
 from atlas.config import load_config
+from atlas.data import write_candidates
 from atlas.http import STATS
-from atlas.paths import DB_PATH, PROCESSED_DIR, RAW_DIR
+from atlas.paths import DB_PATH, RAW_DIR
 from atlas.schema import Project
 
 log = logging.getLogger("atlas.collect")
@@ -119,8 +120,7 @@ def write_outputs(records: dict[str, dict]) -> list[dict]:
     for k in ("sources", "topics", "collect_groups"):
         if k in df:
             df[k] = df[k].map(json.loads)
-    PROCESSED_DIR.mkdir(parents=True, exist_ok=True)
-    df.to_parquet(PROCESSED_DIR / "candidates.parquet", index=False)
+    write_candidates(df)
     log.info("Wrote %d projects to DB, %d included rows to candidates.parquet", len(rows), len(df))
     return rows
 

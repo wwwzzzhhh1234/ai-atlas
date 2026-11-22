@@ -14,13 +14,15 @@ import json
 
 import pandas as pd
 
-from atlas.paths import PROCESSED_DIR, ROOT
+from atlas.data import load_candidates
+from atlas.paths import ROOT
 
 OUT = ROOT / "docs" / "m1_spotcheck.md"
 
 
 def _cell(text, n: int = 90) -> str:
-    s = "" if text is None else str(text).replace("|", "/").replace("\n", " ")
+    s = "" if text is None or (isinstance(text, float) and pd.isna(text)) else \
+        str(text).replace("|", "/").replace("\n", " ")
     return s if len(s) <= n else s[: n - 1] + "…"
 
 
@@ -43,7 +45,7 @@ def main(argv: list[str] | None = None) -> None:
     ap.add_argument("--n", type=int, default=20)
     ap.add_argument("--seed", type=int, default=42)
     args = ap.parse_args(argv)
-    df = pd.read_parquet(PROCESSED_DIR / "candidates.parquet")
+    df = load_candidates(with_readme=True)
     for col in ("sources", "collect_groups"):
         df[col] = df[col].map(lambda v: list(v) if not isinstance(v, str) else json.loads(v))
     sample = df.sample(n=min(args.n, len(df)), random_state=args.seed)

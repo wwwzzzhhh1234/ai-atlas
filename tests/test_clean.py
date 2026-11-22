@@ -47,3 +47,19 @@ def test_merge_unions_sources_and_prefers_metadata():
 
 def test_hf_space_boilerplate_removed():
     assert clean_readme("---\nsdk: gradio\n---\n\nCheck out the configuration reference at https://huggingface.co/docs/hub/spaces-config-reference\n") == ""
+
+
+def test_candidates_roundtrip(tmp_path, monkeypatch):
+    import pandas as pd
+    from atlas import data
+    monkeypatch.setattr(data, "PROCESSED_DIR", tmp_path)
+    monkeypatch.setattr(data, "CANDIDATES", tmp_path / "candidates.parquet")
+    monkeypatch.setattr(data, "README_DIR", tmp_path / "readmes")
+    monkeypatch.setattr(data, "README_SHARD_ROWS", 2)
+    df = pd.DataFrame({"id": ["gh:a/b", "gh:c/d", "gh:e/f"], "name": ["b", "d", "f"],
+                       "readme_excerpt": ["x" * 300, "y" * 300, "z" * 300]})
+    data.write_candidates(df)
+    assert len(list((tmp_path / "readmes").glob("part-*.parquet"))) == 2
+    assert "readme_excerpt" not in data.load_candidates().columns
+    full = data.load_candidates(with_readme=True)
+    assert full.set_index("id").loc["gh:c/d", "readme_excerpt"] == "y" * 300
