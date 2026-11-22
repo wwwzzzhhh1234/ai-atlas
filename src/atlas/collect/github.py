@@ -153,13 +153,21 @@ def collect_topics(client: CachedClient, limit: int | None = None) -> list[dict]
     return out
 
 
+def group_queries(grp: dict) -> list[str]:
+    """All base queries of a keyword group: explicit queries, term x modifier pairs, and topics."""
+    qs = list(grp.get("queries", []))
+    qs += [f"{t} {m}" for t in grp.get("terms", []) for m in grp.get("modifiers", [])]
+    qs += [f"topic:{t}" for t in grp.get("topics", [])]
+    return list(dict.fromkeys(qs))
+
+
 def collect_keyword_groups(client: CachedClient, limit: int | None = None) -> list[dict]:
     cfg = _cfg()
     f = cfg["filters"]
     out = []
     for name, grp in list(cfg["github"]["keyword_groups"].items())[:limit]:
         min_stars = grp.get("min_stars") or (f["min_stars_niche"] if grp.get("niche") else f["min_stars_default"])
-        for query in grp["queries"]:
+        for query in group_queries(grp):
             recs = _run_query_set(client, query, f"kw:{name}", min_stars)
             log.info("kw:%s %r -> %d repos", name, query, len(recs))
             out += recs

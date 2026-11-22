@@ -32,6 +32,7 @@ from atlas.data import write_candidates
 from atlas.http import STATS
 from atlas.paths import DB_PATH, RAW_DIR
 from atlas.schema import Project
+from atlas.select import in_v1_label_set
 
 log = logging.getLogger("atlas.collect")
 
@@ -78,6 +79,9 @@ def attach_readmes(records: dict[str, dict]) -> None:
         rec["has_readme"] = text is not None
         rec["readme_excerpt"] = cleaned or None
         rec["readme_chars"] = len(cleaned)
+        if rec.get("hf_header"):   # HF Space: stitch metadata + README body (decision 2026-11-22)
+            rec["readme_excerpt"] = (rec["hf_header"] + ("\n\n" + cleaned if cleaned else "")).strip()
+            rec["informative_chars"] = len(rec.get("hf_informative") or "") + len(cleaned)
 
     log.info("Fetching READMEs for %d records", len(todo))
     with ThreadPoolExecutor(max_workers=8) as pool:
@@ -120,8 +124,11 @@ def write_outputs(records: dict[str, dict]) -> list[dict]:
     for k in ("sources", "topics", "collect_groups"):
         if k in df:
             df[k] = df[k].map(json.loads)
+    df["label_v1"] = [in_v1_label_set(None if pd.isna(st) else st, None if pd.isna(lk) else lk, g)
+                      for st, lk, g in zip(df["stars"], df["likes"], df["collect_groups"])]
     write_candidates(df)
-    log.info("Wrote %d projects to DB, %d included rows to candidates.parquet", len(rows), len(df))
+    log.info("Wrote %d projects to DB, %d included rows to candidates.parquet (%d in V1 label set)",
+             len(rows), len(df), int(df["label_v1"].sum()))
     return rows
 
 

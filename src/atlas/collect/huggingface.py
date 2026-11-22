@@ -64,7 +64,34 @@ def item_record(item: dict, kind: str) -> dict:
         pushed_at=iso_date(item.get("lastModified")), license_spdx=_license(card),
         language=None, topics=tags[:20], is_fork=False, is_archived=False,
         raw_readme_url=f"https://huggingface.co/{'spaces/' if is_space else ''}{hid}/raw/main/README.md",
+        hf_header=_header(card, item, tags) if is_space else None,
+        hf_informative=" ".join(x for x in (card.get("title"), card.get("short_description")) if x) or None,
     )
+
+
+def _as_list(v) -> list[str]:
+    if not v:
+        return []
+    return [str(x) for x in (v if isinstance(v, list) else [v])]
+
+
+def _header(card: dict, item: dict, tags: list[str]) -> str:
+    """Metadata block prepended to a Space's README excerpt (all values come from the Hub API)."""
+    lines = []
+    if card.get("title"):
+        lines.append(f"Title: {card['title']}")
+    if card.get("short_description"):
+        lines.append(f"Description: {card['short_description']}")
+    sdk = card.get("sdk") or item.get("sdk")
+    if sdk:
+        lines.append(f"SDK: {sdk}")
+    for key, label in (("models", "Models used"), ("datasets", "Datasets used")):
+        vals = _as_list(card.get(key))
+        if vals:
+            lines.append(f"{label}: {', '.join(vals[:10])}")
+    if tags:
+        lines.append(f"Tags: {', '.join(tags[:15])}")
+    return "\n".join(lines)
 
 
 def collect_kind(c: CachedClient, kind: str) -> list[dict]:

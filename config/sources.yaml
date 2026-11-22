@@ -40,14 +40,26 @@ github:
       niche: false
       min_stars: 20               # same as min_stars_by_group.mcp_registry
       queries: ["mcp", "model context protocol"]
+    # Each group runs: every entry of `queries`, every "<term> <modifier>" pair, and every `topic:<t>`.
+    # Short, domain-specific terms (2026-11-22 revision) so niche sectors are not missed.
     healthcare:
       sector: S01
-      niche: false
+      niche: true                 # human decision 2026-11-22: treat healthcare as niche (>= 20 stars)
       queries: ["clinical llm", "medical ai agent", "radiology llm", "ehr llm", "drug discovery llm"]
+      terms: [medical, clinical, healthcare, radiology, biomedical, fhir, "drug discovery", "medical imaging",
+              pathology, "mental health", ehr, protein]
+      modifiers: [ai, agent, llm, vision, mcp]
+      topics: [medical-ai, healthcare-ai, medical-imaging, medical-image-analysis, clinical-nlp, biomedical-nlp,
+               medical-llm, drug-discovery, computational-pathology]
     agriculture_climate:
       sector: S02
       niche: true
       queries: ["agriculture llm", "crop ai agent", "climate llm", "energy grid ai agent", "food supply chain ai"]
+      terms: [agriculture, crop, "plant disease", farming, "precision agriculture", climate, "weather forecasting",
+              "smart grid", energy, solar, battery, carbon, food]
+      modifiers: [ai, agent, llm, "deep learning", mcp]
+      topics: [precision-agriculture, plant-disease-detection, crop-yield-prediction, smart-agriculture,
+               climate-ai, weather-forecasting, energy-forecasting, load-forecasting]
     governance_safety:
       sector: S05.4
       niche: true
@@ -60,10 +72,18 @@ github:
       sector: S09
       niche: true
       queries: ["autonomous driving llm", "traffic signal reinforcement learning llm", "smart city ai agent", "urban digital twin ai", "public transit ai"]
+      terms: ["autonomous driving", self-driving, traffic, "digital twin", urban, v2x, "smart city", transportation,
+              vehicle, lidar, "trajectory prediction", parking]
+      modifiers: [ai, agent, llm, "deep learning", vision]
+      topics: [autonomous-driving, self-driving-car, end-to-end-autonomous-driving, traffic-signal-control,
+               traffic-prediction, traffic-forecasting, trajectory-prediction, smart-city, intelligent-transportation]
     startup:
       sector: S10
       niche: true
       queries: ["startup ai agent", "pitch deck generator llm", "market research ai agent", "business plan llm", "no-code mvp ai"]
+      terms: [startup, "pitch deck", "business plan", "market research", investor, fundraising, "venture capital",
+              "go-to-market", "product hunt", mvp, "no-code", "landing page", "competitor analysis", founder]
+      modifiers: [ai, agent, llm, gpt]
   skill_files:
     code_search_query: "filename:SKILL.md"
     size_slices: ["0..1000", "1001..2000", "2001..4000", "4001..8000", "8001..16000", ">16000"]
@@ -108,7 +128,11 @@ huggingface:
   max_models: 2000
   max_spaces: 2000
   page_size: 100
-  min_likes: 50
+  min_likes: 50                   # (Gemini suggested >= 20; the list is already cut at 50)
+  # Spaces often have a README that is only config. Their excerpt is stitched from
+  # title + short description + SDK/models/datasets/tags + README body. Only *informative* text
+  # (title + short description + README body) counts toward this minimum; tags/SDK do not.
+  space_min_informative_chars: 100
   min_interval_seconds: 0.5
 
 filters:
@@ -123,9 +147,9 @@ filters:
   min_stars_niche: 20             # repos found by a keyword group with niche: true
   min_stars_by_group:             # starting guesses, revisit after the first report
     skill_file: 20
-    curated: 0                    # hand-curated lists are a quality signal on their own
+    curated: 20                   # human decision 2026-11-22: nothing below 20 stars anywhere
     mcp_registry: 20
-  niche_sectors: [S02, S05.4, S09, S10]
+  niche_sectors: [S01, S02, S05.4, S09, S10]   # S01 added by human decision 2026-11-22
   # A record is AI-related if it came from an AI source/topic/keyword search,
   # or its name/description/topics match this pattern (used for curated-list links).
   ai_keywords: "\\b(ai|llm|llms|gpt|agent|agents|agentic|mcp|rag|langchain|llama|claude|gemini|openai|copilot|genai|generative|machine.learning|deep.learning|neural|transformer|diffusion|chatbot|embedding|prompt|skill|skills)\\b"

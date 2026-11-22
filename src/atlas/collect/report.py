@@ -9,6 +9,7 @@ import json
 from collections import Counter
 
 from atlas.paths import DB_PATH, ROOT
+from atlas.select import in_v1_label_set, niche_groups
 
 REPORT_PATH = ROOT / "reports" / "collection_report.md"
 STAR_BUCKETS = [(0, 19), (20, 49), (50, 99), (100, 199), (200, 499), (500, 999), (1000, 4999),
@@ -23,6 +24,11 @@ def _table(counter: Counter, header: tuple[str, str]) -> str:
 
 def _group_key(g: str) -> str:
     return "curated" if g.startswith("curated:") else g
+
+
+def _groups(r: dict) -> list[str]:
+    g = r["collect_groups"]
+    return json.loads(g) if isinstance(g, str) else list(g)
 
 
 def summarize(rows: list[dict]) -> dict:
@@ -45,7 +51,11 @@ def summarize(rows: list[dict]) -> dict:
         for lo, hi in STAR_BUCKETS:
             if r["stars"] >= lo and (hi is None or r["stars"] <= hi):
                 stars[f"{lo:,}+" if hi is None else f"{lo:,}–{hi:,}"] += 1
-    return {"total": len(rows), "included": len(inc), "src_all": src_all, "src_inc": src_inc,
+    v1 = [r for r in inc if in_v1_label_set(r["stars"], r["likes"], _groups(r))]
+    v1_grp = Counter(g for r in v1 for g in {_group_key(x) for x in _groups(r)})
+    cum = {t: sum(1 for r in inc if r["stars"] is not None and r["stars"] >= t) for t in (20, 50, 100, 500)}
+    return {"v1": len(v1), "v1_grp": v1_grp, "cum": cum,
+            "total": len(rows), "included": len(inc), "src_all": src_all, "src_inc": src_inc,
             "grp_all": grp_all, "grp_inc": grp_inc, "stars": stars,
             "reasons": Counter(r["exclude_reason"] for r in rows if not r["included"]),
             "multi_source": sum(1 for r in inc if len(json.loads(r["sources"])) > 1)}
@@ -68,6 +78,15 @@ def render(s: dict, stats=None, elapsed: float | None = None) -> str:
     out += ["", "## By source (included / collected)", "",
             "| Source | Included / collected |", "|---|---:|"]
     out += [f"| {k} | {v} |" for k, v in sorted(src.items())]
+    niche = niche_groups()
+    kw_lines = ["| Keyword group | Niche | Included | In V1 label set |", "|---|---|---:|---:|"] + [
+        f"| {g} | {'yes' if g in niche else 'no'} | {s['grp_inc'][g]:,} | {s['v1_grp'][g]:,} |"
+        for g in sorted(s["grp_all"]) if g.startswith("kw:")]
+    out += ["", "## V1 labeling set (tiered thresholds, config/models.yaml)", "",
+            f"- **{s['v1']:,}** of {s['included']:,} included projects are in the V1 labeling set.",
+            "- Star-filter preview (included GitHub projects): " +
+            " · ".join(f"{t}+: {n:,}" for t, n in s["cum"].items()),
+            "", "### Sector keyword groups", "", *kw_lines]
     out += ["", "## By provenance group", "", *grp_lines,
             "", "## Exclusion reasons", "", _table(s["reasons"], ("Reason", "Count")),
             "", "## Stars histogram (included GitHub projects)", "", *star_lines, ""]

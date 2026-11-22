@@ -75,3 +75,21 @@ def test_hf_item_record():
     assert r["topics"] == ["gradio"] and r["url"] == "https://huggingface.co/spaces/acme/space"
     m = huggingface.item_record({"id": "acme/model", "pipeline_tag": "text-generation"}, "models")
     assert m["id"] == "hf:acme/model" and m["topics"] == ["text-generation"]
+
+
+def test_group_queries_expand_terms_modifiers_topics():
+    grp = {"queries": ["clinical llm"], "terms": ["medical", "drug discovery"], "modifiers": ["ai", "llm"],
+           "topics": ["medical-ai"]}
+    assert github.group_queries(grp) == ["clinical llm", "medical ai", "medical llm", "drug discovery ai",
+                                        "drug discovery llm", "topic:medical-ai"]
+
+
+def test_hf_space_header_and_informative_text():
+    item = {"id": "acme/tryon", "likes": 900, "sdk": "gradio", "tags": ["gradio", "region:us"],
+            "cardData": {"title": "Virtual Try-On", "short_description": "Try clothes on a photo",
+                         "models": ["acme/tryon-model"], "datasets": "acme/clothes"}}
+    r = huggingface.item_record(item, "spaces")
+    assert r["hf_informative"] == "Virtual Try-On Try clothes on a photo"
+    assert "SDK: gradio" in r["hf_header"] and "Models used: acme/tryon-model" in r["hf_header"]
+    assert "Datasets used: acme/clothes" in r["hf_header"]
+    assert huggingface.item_record({"id": "a/m"}, "models")["hf_header"] is None

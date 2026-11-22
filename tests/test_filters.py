@@ -28,8 +28,8 @@ def test_freshness_by_push_date():
 
 def test_niche_and_group_thresholds():
     assert filters.min_stars_for(rec(group="kw:smart_city_transport")) == 20
-    assert filters.min_stars_for(rec(group="kw:healthcare")) == 100
-    assert filters.min_stars_for(rec(group="curated:a/b")) == 0
+    assert filters.min_stars_for(rec(group="kw:healthcare")) == 20      # niche since 2026-11-22
+    assert filters.min_stars_for(rec(group="kw:finance_legal")) == 100
     assert filters.metadata_exclusion(rec(stars=25, group="kw:startup")) is None
 
 
@@ -54,3 +54,21 @@ def test_registry_only_repo_without_metadata():
 
 def test_mcp_keyword_group_threshold():
     assert filters.min_stars_for(rec(group="kw:mcp_servers")) == 20
+
+
+def test_hf_space_informative_threshold():
+    space = new_record("hf:spaces/a/b", source="huggingface", group="hf_space", has_readme=True, readme_chars=10)
+    space["informative_chars"] = 99
+    assert filters.readme_exclusion(space) == "too_little_info"
+    space["informative_chars"] = 150
+    assert filters.readme_exclusion(space) is None
+
+
+def test_v1_label_set_tiers():
+    from atlas.select import in_v1_label_set
+    assert in_v1_label_set(150, None, ["topic:llm"])
+    assert not in_v1_label_set(60, None, ["kw:mcp_servers"])       # general MCP 20-99 -> later
+    assert in_v1_label_set(25, None, ["kw:healthcare"])             # niche keeps >= 20
+    assert not in_v1_label_set(15, None, ["kw:healthcare"])
+    assert in_v1_label_set(None, 80, ["hf_space"]) and not in_v1_label_set(None, None, ["mcp_registry"])
+    assert filters.min_stars_for(rec(group="curated:a/b")) == 20

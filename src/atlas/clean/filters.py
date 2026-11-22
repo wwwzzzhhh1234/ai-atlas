@@ -75,6 +75,10 @@ def metadata_exclusion(rec: dict) -> str | None:
 
 
 def readme_exclusion(rec: dict) -> str | None:
+    if "hf_space" in rec.get("groups", ()):
+        # Spaces: title + short description + README body must carry enough real information.
+        need = load_config("sources")["huggingface"]["space_min_informative_chars"]
+        return None if (rec.get("informative_chars") or 0) >= need else "too_little_info"
     if not rec.get("has_readme"):
         return "no_readme"
     if (rec.get("readme_chars") or 0) < _f()["min_readme_chars"]:
