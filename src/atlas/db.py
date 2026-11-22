@@ -14,7 +14,7 @@ from pathlib import Path
 
 from atlas.paths import DB_PATH
 
-SCHEMA_VERSION = 1
+SCHEMA_VERSION = 2
 
 # JSON-list columns are stored as TEXT holding a JSON array.
 # Booleans are stored as INTEGER 0/1. Dates/datetimes as ISO-8601 TEXT.
@@ -27,6 +27,8 @@ CREATE TABLE IF NOT EXISTS projects (
     sources         TEXT NOT NULL DEFAULT '[]',
     stars           INTEGER,
     forks           INTEGER,
+    likes           INTEGER,                -- Hugging Face
+    downloads       INTEGER,                -- Hugging Face
     created_at      TEXT,
     pushed_at       TEXT,
     license_spdx    TEXT,
@@ -36,6 +38,10 @@ CREATE TABLE IF NOT EXISTS projects (
     is_archived     INTEGER,
     has_readme      INTEGER,
     readme_excerpt  TEXT,
+    readme_chars    INTEGER,
+    collect_groups  TEXT NOT NULL DEFAULT '[]',   -- provenance: topic:llm, kw:healthcare, mcp_registry, ...
+    included        INTEGER NOT NULL DEFAULT 0,   -- 1 = passes all inclusion filters
+    exclude_reason  TEXT,
     collected_at    TEXT NOT NULL
 );
 
@@ -92,12 +98,25 @@ CREATE TABLE IF NOT EXISTS related (
     CHECK (project_id <> related_id)
 );
 
+CREATE INDEX IF NOT EXISTS idx_projects_included ON projects(included);
 CREATE INDEX IF NOT EXISTS idx_labels_sector ON labels(sector_primary);
 CREATE INDEX IF NOT EXISTS idx_labels_field  ON labels(field_primary);
 CREATE INDEX IF NOT EXISTS idx_related_rel   ON related(related_id);
 """
 
 TABLES = ("projects", "labels", "gold_labels", "embeddings", "related")
+
+# Forward migrations: MIGRATIONS[n] upgrades a database from version n to n + 1.
+MIGRATIONS = {
+    1: [
+        "ALTER TABLE projects ADD COLUMN likes INTEGER",
+        "ALTER TABLE projects ADD COLUMN downloads INTEGER",
+        "ALTER TABLE projects ADD COLUMN readme_chars INTEGER",
+        "ALTER TABLE projects ADD COLUMN collect_groups TEXT NOT NULL DEFAULT '[]'",
+        "ALTER TABLE projects ADD COLUMN included INTEGER NOT NULL DEFAULT 0",
+        "ALTER TABLE projects ADD COLUMN exclude_reason TEXT",
+    ],
+}
 
 
 def connect(path: Path | str = DB_PATH) -> sqlite3.Connection:
@@ -113,8 +132,11 @@ def init_db(path: Path | str = DB_PATH) -> Path:
     path.parent.mkdir(parents=True, exist_ok=True)
     with connect(path) as conn:
         current = conn.execute("PRAGMA user_version").fetchone()[0]
-        if current not in (0, SCHEMA_VERSION):
+        if current > SCHEMA_VERSION:
             raise RuntimeError(f"{path} has schema v{current}; code expects v{SCHEMA_VERSION}")
+        for v in range(current or SCHEMA_VERSION, SCHEMA_VERSION):
+            for stmt in MIGRATIONS[v]:
+                conn.execute(stmt)
         conn.executescript(SCHEMA_SQL)
         conn.execute(f"PRAGMA user_version = {SCHEMA_VERSION}")
     return path
@@ -135,6 +157,28 @@ def main(argv: list[str] | None = None) -> None:
         print(f"Database ready at {p} (schema v{SCHEMA_VERSION})")
     for table, n in table_counts(args.path).items():
         print(f"  {table:<12} {n} rows")
+
+
+
+PROJECT_COLUMNS = (
+    "id", "name", "url", "description", "sources", "stars", "forks", "likes", "downloads",
+    "created_at", "pushed_at", "license_spdx", "language", "topics", "is_fork", "is_archived",
+    "has_readme", "readme_excerpt", "readme_chars", "collect_groups", "included", "exclude_reason",
+    "collected_at",
+)
+
+
+def upsert_projects(conn: sqlite3.Connection, rows: list[dict]) -> int:
+    """Insert or update project rows (dicts keyed by PROJECT_COLUMNS, JSON fields already encoded).
+
+    Uses ON CONFLICT ... DO UPDATE (not REPLACE) so rows referenced by labels are never deleted.
+    """
+    cols = ", ".join(PROJECT_COLUMNS)
+    marks = ", ".join(f":{c}" for c in PROJECT_COLUMNS)
+    updates = ", ".join(f"{c} = excluded.{c}" for c in PROJECT_COLUMNS if c != "id")
+    sql = f"INSERT INTO projects ({cols}) VALUES ({marks}) ON CONFLICT(id) DO UPDATE SET {updates}"
+    conn.executemany(sql, rows)
+    return len(rows)
 
 
 if __name__ == "__main__":

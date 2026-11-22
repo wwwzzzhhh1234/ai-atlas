@@ -60,6 +60,8 @@ class Project(_Strict):
     sources: list[Source] = Field(min_length=1)
     stars: int | None = Field(default=None, ge=0)
     forks: int | None = Field(default=None, ge=0)
+    likes: int | None = Field(default=None, ge=0)        # Hugging Face
+    downloads: int | None = Field(default=None, ge=0)    # Hugging Face
     created_at: date | None = None
     pushed_at: date | None = None
     license_spdx: str | None = None
@@ -69,6 +71,10 @@ class Project(_Strict):
     is_archived: bool | None = None
     has_readme: bool | None = None
     readme_excerpt: str | None = None   # internal only — never shown publicly
+    readme_chars: int | None = Field(default=None, ge=0)
+    collect_groups: list[str] = Field(default_factory=list)
+    included: bool = False
+    exclude_reason: str | None = None
     collected_at: datetime
 
     @field_validator("id")

@@ -1,6 +1,10 @@
 # Collection sources, queries and inclusion thresholds (spec Section 7).
 # All numbers are starting guesses — revisit after the first M1 report.
 
+# Fixed collection date. Query strings (and therefore cache keys) are derived from it, so re-runs
+# hit the cache. Change it only to take a NEW snapshot (it will re-query everything).
+snapshot_date: 2026-11-22
+
 github:
   api_base: https://api.github.com
   graphql_url: https://api.github.com/graphql
@@ -55,25 +59,47 @@ github:
       queries: ["startup ai agent", "pitch deck generator llm", "market research ai agent", "business plan llm", "no-code mvp ai"]
   skill_files:
     code_search_query: "filename:SKILL.md"
-  curated_lists:   # parsed for repo links; the lists themselves are asset_type=resource
+    size_slices: ["0..1000", "1001..2000", "2001..4000", "4001..8000", "8001..16000", ">16000"]
+    max_pages_per_slice: 10
+    min_interval_seconds: 6.5     # code search: 10 requests/min
+  curated_lists:   # parsed for repo links (README via raw.githubusercontent.com); lists themselves get asset_type=resource
     - anthropics/skills
     - heilcheng/awesome-agent-skills
     - github/awesome-copilot
-  slicing:
-    star_ranges: [[100, 199], [200, 499], [500, 999], [1000, 4999], [5000, null]]
-    niche_star_ranges: [[20, 49], [50, 99]]
-    created_after: "2018-01-01"   # lower bound for date slicing only; freshness filter is separate
-    date_slice_months: 3
+  search:
+    # Adaptive slicing: a query with > 1000 hits is split by star range, then by creation date,
+    # until every slice returns <= 1000 results (GitHub Search API cap).
+    per_page: 100
+    max_results_per_slice: 1000
+    created_from: "2008-01-01"    # lower bound for date slicing only
+    min_interval_seconds: 2.2     # search API: 30 requests/min
+    # Freshness is pushed into the query (spec Section 7: created >= 2025-01-01 OR pushed within 12 months).
+    # Each base query is run once per clause below; {pushed_cutoff} = today - or_pushed_within_months.
+    freshness_clauses:
+      - "pushed:>={pushed_cutoff}"
+      - "created:>=2025-01-01 pushed:<{pushed_cutoff}"
+    extra_qualifiers: "archived:false"
+    repo_lookup_batch_size: 6      # repo:a/b qualifiers per search query (query length limit 256)
+
+github_raw:
+  base_url: https://raw.githubusercontent.com
+  readme_candidates: [README.md, readme.md, Readme.md, README.MD, README.rst, README.txt, README]
+  min_interval_seconds: 0.05
 
 mcp_registry:
   base_url: https://registry.modelcontextprotocol.io
-  api_version: null   # TODO(M1): confirm current API version from the registry docs
+  api_version: v0.1   # verified 2026-11-22 (v0 also responds; v0.1 is current)
   page_size: 100
+  min_interval_seconds: 0.3
 
 huggingface:
-  sort_by: [likes, downloads]
+  api_base: https://huggingface.co
+  sort_by: likes
   max_models: 2000
   max_spaces: 2000
+  page_size: 100
+  min_likes: 50
+  min_interval_seconds: 0.5
 
 filters:
   require_ai_related: true
@@ -84,8 +110,16 @@ filters:
     created_on_or_after: "2025-01-01"
     or_pushed_within_months: 12
   min_stars_default: 100
-  min_stars_niche: 20
+  min_stars_niche: 20             # repos found by a keyword group with niche: true
+  min_stars_by_group:             # starting guesses, revisit after the first report
+    skill_file: 20
+    curated: 0                    # hand-curated lists are a quality signal on their own
+    mcp_registry: 20
   niche_sectors: [S02, S05.4, S09, S10]
+  # A record is AI-related if it came from an AI source/topic/keyword search,
+  # or its name/description/topics match this pattern (used for curated-list links).
+  ai_keywords: "\\b(ai|llm|llms|gpt|agent|agents|agentic|mcp|rag|langchain|llama|claude|gemini|openai|copilot|genai|generative|machine.learning|deep.learning|neural|transformer|diffusion|chatbot|embedding|prompt|skill|skills)\\b"
+  readme_excerpt_max_chars: 12000 # ~3,000 tokens
 
 http:
   max_retries: 5
