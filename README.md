@@ -26,6 +26,18 @@ python -m atlas.db init       # creates data/atlas.db
 python -m atlas.db info       # table row counts
 ```
 
+## Collect candidates (M1)
+
+```powershell
+python -m atlas.collect.run                 # all sources (~1 h the first time; re-runs use the cache)
+python -m atlas.collect.run --only github   # one source: github | mcp | hf
+python -m atlas.collect.report              # rebuild reports/collection_report.md from the DB
+python -m atlas.collect.spotcheck           # 20 random rows -> docs/m1_spotcheck.md for manual review
+```
+
+Every HTTP response is cached in `data/cache/http/` (not committed), so an interrupted run resumes
+where it stopped. `GITHUB_TOKEN` in `.env` is used for the GitHub API when present.
+
 ## Layout
 - `config/` — taxonomy, data sources, models/prices/budget (edit these, not the code)
 - `src/atlas/` — pipeline code (`collect`, `clean`, `enrich`, `embed`, `evaluate`, `analyze`)
