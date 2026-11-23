@@ -66,8 +66,13 @@ github:
       queries: ["llm guardrails", "agent governance", "ai compliance llm", "llm red teaming", "agent sandbox"]
     finance_legal:
       sector: S05
-      niche: false
+      niche: false                # stays at >= 100 stars (not a niche sector in the spec)
       queries: ["finance llm agent", "legal llm", "contract review llm", "accounting ai agent"]
+      terms: [finance, financial, trading, quant, stock, fintech, banking, insurance, accounting, tax, invoice,
+              audit, legal, law, contract]
+      modifiers: [ai, agent, llm, mcp]
+      topics: [quantitative-finance, algorithmic-trading, financial-analysis, stock-prediction, fintech-ai,
+               legal-ai, legaltech, legal-nlp]
     smart_city_transport:
       sector: S09
       niche: true

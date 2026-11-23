@@ -1,0 +1,21 @@
+# Gold-standard sample (M2). Drawn only from the V1 labeling set (label_v1 = true).
+seed: 2026
+# Sector strata: projects found by these keyword groups (so small sectors are guaranteed to appear).
+sector_quota:
+  kw:healthcare: 20
+  kw:agriculture_climate: 20
+  kw:smart_city_transport: 20
+  kw:startup: 20
+  kw:finance_legal: 20
+  kw:governance_safety: 20
+# Everything else, stratified by a rough (heuristic) asset type so every type appears.
+asset_type_quota:
+  mcp: 25
+  skill: 20
+  agent: 20
+  model: 15        # Hugging Face models
+  space_app: 10    # Hugging Face Spaces
+  workflow: 10     # n8n / Dify
+  governance: 10
+  other: 20        # general apps, libraries, tools
+overlap_size: 60   # items also labeled by annotator 2 (spec: >= 50) for Cohen's kappa
