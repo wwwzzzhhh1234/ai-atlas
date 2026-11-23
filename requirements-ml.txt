@@ -1,0 +1,4 @@
+# Heavy ML dependencies, needed from M4 (embeddings + related projects). Downloads PyTorch (~1 GB).
+#   pip install -r requirements-ml.txt
+-r requirements.txt
+sentence-transformers>=3.0

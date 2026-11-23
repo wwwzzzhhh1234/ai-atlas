@@ -12,7 +12,7 @@ git clone https://github.com/<you>/ai-atlas.git
 cd ai-atlas
 py -3.11 -m venv .venv
 .\.venv\Scripts\Activate.ps1
-pip install -r requirements.txt
+pip install -r requirements.txt     # light; add requirements-ml.txt (PyTorch, ~1 GB) only for M4
 pip install -e .
 Copy-Item .env.example .env   # then edit .env and add your keys
 ```
