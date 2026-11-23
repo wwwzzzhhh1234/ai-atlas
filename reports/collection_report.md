@@ -1,29 +1,29 @@
 # Collection report
 
-- Unique projects collected: **91,437**
-- Included (pass all filters): **28,493**
-- Included projects found by more than one source: 1,901
-- HTTP: 3,106 network calls, 30,168 cache hits, 0 errors, 29.9 min
+- Unique projects collected: **92,158**
+- Included (pass all filters): **29,206**
+- Included projects found by more than one source: 1,906
+- HTTP: 963 network calls, 33,248 cache hits, 0 errors, 9.4 min
 
 ## By source (included / collected)
 
 | Source | Included / collected |
 |---|---:|
-| github | 26,941 / 30,292 |
+| github | 27,654 / 31,018 |
 | huggingface | 1,552 / 4,000 |
-| mcp_registry | 1,901 / 59,064 |
+| mcp_registry | 1,906 / 59,064 |
 
 ## V1 labeling set (tiered thresholds, config/models.yaml)
 
-- **18,323** of 28,493 included projects are in the V1 labeling set.
-- Star-filter preview (included GitHub projects): 20+: 26,941 · 50+: 18,366 · 100+: 14,398 · 500+: 5,079
+- **19,036** of 29,206 included projects are in the V1 labeling set.
+- Star-filter preview (included GitHub projects): 20+: 27,654 · 50+: 19,079 · 100+: 15,111 · 500+: 5,319
 
 ### Sector keyword groups
 
 | Keyword group | Niche | Included | In V1 label set |
 |---|---|---:|---:|
 | kw:agriculture_climate | yes | 363 | 363 |
-| kw:finance_legal | no | 59 | 59 |
+| kw:finance_legal | no | 1,389 | 1,389 |
 | kw:governance_safety | yes | 1,486 | 1,486 |
 | kw:healthcare | yes | 950 | 950 |
 | kw:mcp_servers | no | 15,100 | 5,363 |
@@ -34,7 +34,7 @@
 
 | Group | Included / collected |
 |---|---:|
-| mcp_registry | 1,901 / 59,064 |
+| mcp_registry | 1,906 / 59,064 |
 | kw:mcp_servers | 15,100 / 15,238 |
 | topic:llm | 4,936 / 4,966 |
 | skill_file | 781 / 3,853 |
@@ -45,6 +45,7 @@
 | kw:governance_safety | 1,486 / 1,493 |
 | topic:mcp-server | 1,473 / 1,477 |
 | topic:ai-agent | 1,441 / 1,444 |
+| kw:finance_legal | 1,389 / 1,405 |
 | topic:agent-skills | 1,351 / 1,353 |
 | topic:rag | 1,019 / 1,022 |
 | topic:agentic-ai | 1,016 / 1,019 |
@@ -62,7 +63,6 @@
 | topic:ai-safety | 115 / 115 |
 | topic:n8n | 91 / 92 |
 | topic:guardrails | 71 / 71 |
-| kw:finance_legal | 59 / 62 |
 | topic:crewai | 51 / 52 |
 | topic:dify | 40 / 40 |
 | topic:autogen | 34 / 35 |
@@ -71,12 +71,12 @@
 
 | Reason | Count |
 |---|---:|
-| not_found_by_search | 31,598 |
-| no_readme | 25,810 |
+| not_found_by_search | 31,593 |
+| no_readme | 25,815 |
 | low_stars | 3,080 |
 | stale | 1,610 |
 | too_little_info | 709 |
-| short_readme | 119 |
+| short_readme | 127 |
 | metadata_not_found | 13 |
 | not_ai_related | 5 |
 
@@ -86,10 +86,10 @@
 |---|---:|
 | 20–49 | 8,575 |
 | 50–99 | 3,968 |
-| 100–199 | 5,348 |
-| 200–499 | 3,971 |
-| 500–999 | 1,932 |
-| 1,000–4,999 | 2,124 |
-| 5,000–19,999 | 696 |
-| 20,000+ | 327 |
+| 100–199 | 5,635 |
+| 200–499 | 4,157 |
+| 500–999 | 2,026 |
+| 1,000–4,999 | 2,214 |
+| 5,000–19,999 | 738 |
+| 20,000+ | 341 |
 | n/a (HF / registry-only) | 1,552 |

@@ -1,6 +1,6 @@
 # Progress log
 
-**Current milestone: M1 — Collection: checks done + tuning applied; waiting for human sign-off. Next: M2 — Gold set**
+**Current milestone: M2 — Gold set (tooling ready; waiting for annotator 1 to label 250 items)**
 
 ---
 
@@ -88,3 +88,19 @@ New numbers (re-run: 3,106 new HTTP calls, 0 errors, 30 min)
 Open items for the human
 - Optionally broaden `finance_legal` the same way (S05.1–S05.3 currently 59 candidates).
 - Confirm the M1 spot check (`docs/m1_spotcheck.md`) → then M2 starts.
+
+## 2026-11-23 — M1 signed off by human; M2 Gold set started
+
+- M1 confirmed by the human (spot check accepted).
+- finance_legal broadened like the other sector groups: 59 → **1,389** candidates (≥ 100 stars; not niche).
+  Final M1 snapshot: 92,158 collected · **29,206 included** · **19,036 in the V1 label set** (963 new calls, 0 errors).
+- M2 tooling built: `config/gold.yaml`, `atlas.evaluate.sample_gold` (stratified), `app/label_gold.py` (Streamlit
+  labeling tool, tested headlessly with AppTest), `atlas.evaluate.gold` (DB + CSV mirror), `atlas.evaluate.agreement` (kappa).
+- Gold sample drawn (seed 2026): **250 items** = 6 sector strata × 20 + 8 rough asset-type strata (130); **61 overlap** items.
+- `docs/annotation_guideline.md` completed (definitions, tie-breaks, real examples per sector).
+- Taxonomy gaps found (need advisor decision, no change made): no field for general foundation models / LLM infra;
+  no asset type for generic ML libraries. Provisional rules + `gap:` notes in the guideline.
+
+"Done when" (M2)
+- [ ] All 250 items labeled by annotator 1 (human).
+- [ ] Cohen's kappa on the overlap subset — pending until annotator 2 is named.
